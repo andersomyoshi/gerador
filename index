@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrator de ID Google Drive</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #28a745;
+        }
+        /* Botão Principal (Gerar) */
+        .btn-gerar {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-gerar:hover {
+            background-color: #218838;
+        }
+
+        .resultado-box {
+            margin-top: 25px;
+            text-align: left;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .output-field {
+            background-color: #e9ecef;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            word-break: break-all;
+            font-family: monospace;
+            color: #333;
+            margin-bottom: 8px; /* Espaço entre o texto e o botão copiar */
+        }
+        
+        /* Botão de Copiar */
+        .btn-copiar {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+        .btn-copiar:hover {
+            background-color: #0056b3;
+        }
+        /* Estilo para quando o botão for clicado */
+        .copiado {
+            background-color: #6c757d !important;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Gerador de ID & Links</h2>
+        <p style="color: #666; font-size: 14px;">Cole o link do Google Drive abaixo:</p>
+        
+        <input type="text" id="inputUrl" placeholder="Cole o link aqui...">
+        
+        <button class="btn-gerar" onclick="gerarRespostas()">Gerar Códigos</button>
+
+        <div class="resultado-box">
+            <label>1. Apenas o Código (ID):</label>
+            <div class="output-field" id="resId">...</div>
+            <button class="btn-copiar" id="btnCopiar1" onclick="copiarTexto('resId', 'btnCopiar1')">Copiar Código</button>
+
+            <label>2. Link Formatado:</label>
+            <div class="output-field" id="resLink">...</div>
+            <button class="btn-copiar" id="btnCopiar2" onclick="copiarTexto('resLink', 'btnCopiar2')">Copiar Link</button>
+        </div>
+    </div>
+
+    <script>
+        function gerarRespostas() {
+            var urlCompleta = document.getElementById('inputUrl').value;
+
+            if (urlCompleta === "") {
+                alert("Cole um link primeiro!");
+                return;
+            }
+
+            try {
+                // Lógica de extração
+                var parte1 = urlCompleta.split('/file/d/');
+                // Verifica se o link tem o formato correto
+                if (parte1.length < 2) throw "Formato inválido";
+
+                var parte2 = parte1[1].split('/view');
+                var idExtraido = parte2[0];
+
+                var prefixo = "https://lh3.googleusercontent.com/d/";
+                var linkFinal = prefixo + idExtraido;
+
+                // Exibe os resultados
+                document.getElementById('resId').innerText = idExtraido;
+                document.getElementById('resLink').innerText = linkFinal;
+
+            } catch (erro) {
+                alert("Link inválido. Certifique-se que é um link de arquivo do Google Drive.");
+            }
+        }
+
+        function copiarTexto(idElementoTexto, idBotao) {
+            // Pega o texto do elemento (div)
+            var texto = document.getElementById(idElementoTexto).innerText;
+
+            // Evita copiar se for o texto padrão "..."
+            if (texto === "...") return;
+
+            // Copia para a área de transferência
+            navigator.clipboard.writeText(texto).then(function() {
+                // Feedback Visual: Muda o botão
+                var botao = document.getElementById(idBotao);
+                var textoOriginal = botao.innerText;
+
+                botao.innerText = "Copiado!";
+                botao.classList.add("copiado");
+
+                // Volta ao normal depois de 2 segundos
+                setTimeout(function() {
+                    botao.innerText = textoOriginal;
+                    botao.classList.remove("copiado");
+                }, 2000);
+            }, function(err) {
+                alert('Erro ao copiar: ' + err);
+            });
+        }
+    </script>
+
+</body>
+</html>
