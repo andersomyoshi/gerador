@@ -28,18 +28,43 @@
             color: #333;
             margin-bottom: 20px;
         }
-        input[type="text"] {
+
+        /* --- NOVO ESTILO: Container para alinhar botão e input --- */
+        .input-group {
+            display: flex;
             width: 90%;
+            margin: 0 auto 15px auto; /* Centraliza e dá espaço abaixo */
+            gap: 10px; /* Espaço entre o botão limpar e o campo */
+        }
+
+        /* Botão Limpar (Novo) */
+        .btn-limpar {
+            background-color: #dc3545; /* Vermelho */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-limpar:hover {
+            background-color: #c82333;
+        }
+
+        input[type="text"] {
+            width: 100%; /* Agora ocupa o espaço restante do flex */
             padding: 12px;
-            margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
             outline: none;
+            /* Removemos a margem inferior aqui pois o grupo já tem */
         }
         input:focus {
             border-color: #28a745;
         }
+        
         /* Botão Principal (Gerar) */
         .btn-gerar {
             background-color: #28a745;
@@ -49,7 +74,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 18px;
-            width: 100%;
+            width: 90%; /* Ajustado para alinhar com o grupo de cima */
             font-weight: bold;
             transition: background 0.3s;
         }
@@ -76,7 +101,7 @@
             word-break: break-all;
             font-family: monospace;
             color: #333;
-            margin-bottom: 8px; /* Espaço entre o texto e o botão copiar */
+            margin-bottom: 8px;
         }
         
         /* Botão de Copiar */
@@ -94,7 +119,6 @@
         .btn-copiar:hover {
             background-color: #0056b3;
         }
-        /* Estilo para quando o botão for clicado */
         .copiado {
             background-color: #6c757d !important;
             cursor: default;
@@ -103,12 +127,14 @@
 </head>
 <body>
 
-
     <div class="container">
         <h2>Gerador de ID & Links</h2>
         <p style="color: #666; font-size: 14px;">Cole o link do Google Drive abaixo:</p>
         
-        <input type="text" id="inputUrl" placeholder="Cole o link aqui...">
+        <div class="input-group">
+            <button class="btn-limpar" onclick="limparCampo()" title="Limpar campo">Limpar</button>
+            <input type="text" id="inputUrl" placeholder="Cole o link aqui...">
+        </div>
         
         <button class="btn-gerar" onclick="gerarRespostas()">Gerar Códigos</button>
 
@@ -124,6 +150,13 @@
     </div>
 
     <script>
+        // Função nova para limpar o campo
+        function limparCampo() {
+            var campo = document.getElementById('inputUrl');
+            campo.value = ""; // Limpa o texto
+            campo.focus();    // Coloca o cursor de volta no campo
+        }
+
         function gerarRespostas() {
             var urlCompleta = document.getElementById('inputUrl').value;
 
@@ -133,18 +166,15 @@
             }
 
             try {
-                // Lógica de extração
                 var parte1 = urlCompleta.split('/file/d/');
-                // Verifica se o link tem o formato correto
                 if (parte1.length < 2) throw "Formato inválido";
 
                 var parte2 = parte1[1].split('/view');
                 var idExtraido = parte2[0];
 
-                var prefixo = "https://lh3.googleusercontent.com/d/";
+                var prefixo = "https://lh3.googleusercontent.com/d/"; // Você pode querer checar este prefixo, geralmente para imagens é lh3.googleusercontent.com ou similar, mas mantive seu original.
                 var linkFinal = prefixo + idExtraido;
 
-                // Exibe os resultados
                 document.getElementById('resId').innerText = idExtraido;
                 document.getElementById('resLink').innerText = linkFinal;
 
@@ -154,22 +184,16 @@
         }
 
         function copiarTexto(idElementoTexto, idBotao) {
-            // Pega o texto do elemento (div)
             var texto = document.getElementById(idElementoTexto).innerText;
-
-            // Evita copiar se for o texto padrão "..."
             if (texto === "...") return;
 
-            // Copia para a área de transferência
             navigator.clipboard.writeText(texto).then(function() {
-                // Feedback Visual: Muda o botão
                 var botao = document.getElementById(idBotao);
                 var textoOriginal = botao.innerText;
 
                 botao.innerText = "Copiado!";
                 botao.classList.add("copiado");
 
-                // Volta ao normal depois de 2 segundos
                 setTimeout(function() {
                     botao.innerText = textoOriginal;
                     botao.classList.remove("copiado");
